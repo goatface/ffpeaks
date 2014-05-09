@@ -6,8 +6,9 @@ What: Calibrate your silicon strip detectors with an alpha source!
 Credits: Some ideas from the examples multifit.C and peaks.C by Rene Brun 
 Last updated: 05 Jun 2012 20:21:47 
 
-Call with no arguements to see options:
-daid@titanium ~/active/progs/alpha-calib-root % root 
+Call with no arguments to see how to invoke:
+
+daid@titanium ~/active/progs/alpha-calib-root % root
 
 *****************************
 * Welcome to ROOT v5.34/18 *
