@@ -1,0 +1,15 @@
+#!/bin/bash
+
+#converts my style into the style required for ANAPAW
+
+# delete all lines beginning with "#" and put the results into a tmp hidden file
+cat $1 | sed '/#/d' > .daid2ana
+
+echo "Pedestals"
+# read in the first column of the tmp file, and separate the item on each line with ","
+cat .daid2ana | awk '{printf $1 ","}'
+echo ""
+echo "Gain"
+# read in the second column of the tmp file, and separate the item on each line with ","
+cat .daid2ana | awk '{printf $2 ","}'
+echo ""
