@@ -2,7 +2,7 @@
             DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
                     Version 2, December 2004
 
- Copyright (C) 2010, 2011, 2012 daid kahl <daidxor@gmail.com>
+ Copyright (C) 2010, 2011, 2012, 2015 daid kahl <daidxor@gmail.com>
 
  Everyone is permitted to copy and distribute verbatim or modified
  copies of this license document, and changing it is allowed as long
@@ -14,12 +14,12 @@
   0. You just DO WHAT THE FUCK YOU WANT TO.
 */
 
-// Name: ffpeaks version 0.5
+// Name: ffpeaks version 0.6
 // Runs by: ROOT macro
 // Does: FINDS and FITS peaks with Gaussians, and then linearizes the results
 // What: Calibrate your silicon strip detectors with an alpha source!
 // Credits: Some ideas from the examples multifit.C and peaks.C by Rene Brun 
-// Last updated: 05 Jun 2012 20:21:47  
+// Last updated: 22 May 2015 00:07:40 
 
 // some includes we need
 #include "TCanvas.h" // draws stuff
@@ -31,6 +31,8 @@
 
 // output to user on null call
 Int_t Usage(){ 
+   cout << "ffpeaks v. 0.6\n";
+   cout << "\tAuthor: daid kahl\n";
    cout << "Usage:\n";
    cout << "ffpeaks.C(const Int_t np=0, char run[100], const char *ch_name, const Int_t ch_start, const Int_t ch_stop=ch_start, const Int_t interactive=1, const Int_t minimum, const Int_t maximum)" <<endl;
    cout << "\tnp: number of peaks.  Default: 0 (this message).\n";
@@ -41,11 +43,19 @@ Int_t Usage(){
    cout << "\t[interactive]: Toggle on interactivity; 1 is interactive, 0 is automated.  Default: 1\n"; 
    cout << "\t[minimum]: Minimum value (increase to remove pedestal); Default: 0\n";
    cout << "\t[maximum]: Maximum value; Default: 4096\n";
+   cout << "\t\tNOTE! [minimum] and [maximum] take *bin* value and not the *value*.  Please check your histogram binning!\n";
 }
 
 
 void ffpeaks(const Int_t np=0,char run[100],const char *ch_name,const Int_t ch_start,const Int_t ch_stop, const Int_t interactive=1, const Int_t minimum=0, const Int_t maximum=4096) {
    // A few other options
+   // Even if you are not a coding expert, you should be free to change these as you need!!
+   // calibsets and calibpeaks all may need to be changed if you don't use CRIB alpha sources 2 and 3 (or some strange condition)
+
+
+   //halfwidth is used for the Gaussian fitting. 
+   // 	Spectra from different detectors and data runs often need this to be tuned.
+   
    // 70 um SSD
    //Int_t halfwidth=10;
    // ACTIVE TARGET 500 um SSD
@@ -56,14 +66,26 @@ void ffpeaks(const Int_t np=0,char run[100],const char *ch_name,const Int_t ch_s
    //Int_t halfwidth=150;
    //for pedestal
    //Int_t halfwidth=5;
-   // If one peak is much smaller and is not found before the shoulder of a larger peak, increase this!
-   const Int_t npeaks_help=2; 
+   
+   //npeaks_help is the number of helper peaks (added to the main npeaks you WANT to find
+   // 	If one peak is much smaller and is not found before the shoulder of a larger peak, increase this!
+   // 	The code has an automagically user interaction way to discard the false peaks spectra-by-spectra
+   
+   const Int_t npeaks_help=0; 
+   
    //[peak_autofind]: Toggle on peak finding; 1 is automated, 0 is direct user input.  Default: 1
+   
    const Int_t peak_autofind=1;
+   
    //[linearize]: Toggle on linear fitting; 1 is linear fitting ON, 0 is linear fitting OFF.  Default: 1
+   
    const Int_t linearize=1;
+   
    //[printpeaks]: Toggle on printing peaks to file; 1 is peak printing ON, 0 is peak printing OFF.  Default: 0
-   const Int_t printpeaks=1;
+   //  Disable this unless you need to debug or confirm.  
+   //  You DO NOT want these output to the calibration file as a general rule.
+   
+   const Int_t printpeaks=0;
    
   if (np==0){
       Usage();
@@ -223,7 +245,8 @@ void ffpeaks(const Int_t np=0,char run[100],const char *ch_name,const Int_t ch_s
 	 for (Int_t i=0;i<np;i++){
 	   datapoints[i]=xfit[i];
 	 } 
-
+	// CRIB Specific settings for our two main alpha sources.  
+	// If you have an unusual condition, or a different alpha set, you MUST CHANGE THIS
 	const Int_t calibsets=2; // there are two calibration sets, but only one will apply to any detector
 	// don't worry, we chi square fit to determine automagically the alpha source used!
         //Double_t calibpeaksall[calibsets][3] = {4.780,5.480,5.795,3.180,5.480,5.795}; // set 0 is CRIB alpha 2, set 1 is CRIB alpha 3
