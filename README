@@ -1,10 +1,10 @@
 Author: daid kahl
-Name: ffpeaks version 0.5
+Name: ffpeaks version 0.6
 Runs by: ROOT macro
 Does: FINDS and FITS peaks with Gaussians, and then linearizes the results
 What: Calibrate your silicon strip detectors with an alpha source!
 Credits: Some ideas from the examples multifit.C and peaks.C by Rene Brun 
-Last updated: 05 Jun 2012 20:21:47 
+Last updated: 22 May 2015 00:57:27  
 
 Call with no arguments to see how to invoke:
 
