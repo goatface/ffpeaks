@@ -37,7 +37,7 @@ Int_t Usage(){
    cout << "ffpeaks.C(const Int_t np=0, char run[100], const char *ch_name, const Int_t ch_start, const Int_t ch_stop=ch_start, const Int_t interactive=1, const Int_t minimum, const Int_t maximum)" <<endl;
    cout << "\tnp: number of peaks.  Default: 0 (this message).\n";
    cout << "\trun: Name of run file (DO NOT PUT '.root'). Default: nothing.  Must be in double quotes!\n";
-   cout << '\tch_name: name of the histogram base ("strip_ch1" base is "strip_ch").  Must be in double quotes!\n';
+   cout << "\tch_name: name of the histogram base (\"strip_ch1\" base is \"strip_ch\").  Must be in double quotes!\n";
    cout << "\tch_start: channel to start analyzing.\n";
    cout << "\t[ch_stop]: channel to stop analyzing.  Default: ch_stop=ch_start.\n";
    cout << "\t[interactive]: Toggle on interactivity; 1 is interactive, 0 is automated.  Default: 1\n"; 
@@ -87,6 +87,10 @@ void ffpeaks(const Int_t np=0,char run[100],const char *ch_name,const Int_t ch_s
    //  You DO NOT want these output to the calibration file as a general rule.
    
    const Int_t printpeaks=0;
+
+   // You can rebin your histogram here.  Binning that is too small for raw data finds to many peaks in the same region
+
+   const Int_t rebin=10;
    
   if (np==0){
       Usage();
@@ -113,7 +117,7 @@ void ffpeaks(const Int_t np=0,char run[100],const char *ch_name,const Int_t ch_s
      fout << "# " << name << " " << run_name ;
      npeaks = TMath::Abs(np);
      TH1F *h = (TH1F*)(f->Get(name))->Clone("h");
-     h->Rebin(10);
+     h->Rebin(rebin);
      h->GetXaxis()->SetRange(minimum,maximum); 
      TH1F *h2 = (TH1F*)h->Clone("h2");
      //h2->Rebin(10);
