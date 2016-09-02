@@ -19,7 +19,7 @@
 // Does: FINDS and FITS peaks with Gaussians, and then linearizes the results
 // What: Calibrate your silicon strip detectors with an alpha source!
 // Credits: Some ideas from the examples multifit.C and peaks.C by Rene Brun 
-// Last updated: 22 May 2015 00:07:40 
+// Last updated: 02 Sep 2016 14:08:04 
 
 // some includes we need
 #include "TCanvas.h" // draws stuff
@@ -31,7 +31,7 @@
 
 // output to user on null call
 Int_t Usage(){ 
-   cout << "ffpeaks v. 0.6\n";
+   cout << "ffpeaks v. 0.62\n";
    cout << "\tAuthor: daid kahl\n";
    cout << "Usage:\n";
    cout << "ffpeaks.C(const Int_t np=0, char run[100], const char *ch_name, const Int_t ch_start, const Int_t ch_stop=ch_start, const Int_t interactive=1, const Int_t minimum, const Int_t maximum)" <<endl;
@@ -58,10 +58,11 @@ void ffpeaks(const Int_t np=0,char run[100],const char *ch_name,const Int_t ch_s
    
    // 70 um SSD
    //Int_t halfwidth=10;
+   Int_t halfwidth=50;
    // ACTIVE TARGET 500 um SSD
    //Int_t halfwidth=150;
    //for pad
-   Int_t halfwidth=15;
+   //Int_t halfwidth=20;
    //for strips
    //Int_t halfwidth=150;
    //for pedestal
@@ -112,8 +113,10 @@ void ffpeaks(const Int_t np=0,char run[100],const char *ch_name,const Int_t ch_s
      fout << "# " << name << " " << run_name ;
      npeaks = TMath::Abs(np);
      TH1F *h = (TH1F*)(f->Get(name))->Clone("h");
+     h->Rebin(10);
      h->GetXaxis()->SetRange(minimum,maximum); 
      TH1F *h2 = (TH1F*)h->Clone("h2");
+     //h2->Rebin(10);
      Float_t xpeaks[np];
      if ( peak_autofind == 1){
        //Use TSpectrum to find the peak candidates
@@ -128,14 +131,14 @@ void ffpeaks(const Int_t np=0,char run[100],const char *ch_name,const Int_t ch_s
        }
        if (nfound < np){
             cout << "Could not find " << np << " peaks as user input requests!" << endl;
-            cout << "Continue anyway? (yes/no): ";
+            cout << "Continue with this channel anyway? (yes/no): ";
             char input;
             std::cin >> input;
             switch (input){
             case 'y': case 'Y': case 'yes': case 'Yes': const Int_t np=nfound; continue; // redfinition of np might give invalid pointer error...needs testing!
             //case 'y': case 'Y': case 'yes': case 'Yes': const Int_t np=nfound; continue; // redfinition of np might give invalid pointer error...needs testing!
+            case 'n': case 'N': case 'no': case 'No': ch_no++; if (linearize) fout << "\n0.0\t\t1.0\n"; goto top;
             default: cout << "User input error...exiting." << endl; 
-            case 'n': case 'N': case 'no': case 'No': ch_no++; goto top;
             }
        }
        // by default we will try to keep ALL peaks
