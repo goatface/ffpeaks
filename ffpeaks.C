@@ -57,12 +57,12 @@ void ffpeaks(const Int_t np=0,char run[100],const char *ch_name,const Int_t ch_s
    // 	Spectra from different detectors and data runs often need this to be tuned.
    
    // 70 um SSD
-   //Int_t halfwidth=10;
-   Int_t halfwidth=50;
+   //Int_t halfwidth=40;
+   //Int_t halfwidth=50;
    // ACTIVE TARGET 500 um SSD
-   //Int_t halfwidth=150;
+//   Int_t halfwidth=150;
    //for pad
-   //Int_t halfwidth=20;
+   Int_t halfwidth=20;
    //for strips
    //Int_t halfwidth=150;
    //for pedestal
