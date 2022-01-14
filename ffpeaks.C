@@ -1,26 +1,20 @@
 /*
             DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
                     Version 2, December 2004
-
- Copyright (C) 2010, 2011, 2012, 2015 daid kahl <daidxor@gmail.com>
-
+ Copyright (C) 2010, 2011, 2012, 2015 daid kahl; 2021 Thomas Chillery
  Everyone is permitted to copy and distribute verbatim or modified
  copies of this license document, and changing it is allowed as long
  as the name is changed.
-
             DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
    TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
-
   0. You just DO WHAT THE FUCK YOU WANT TO.
 */
-
-// Name: ffpeaks version 0.6
+// Name: ffpeaks version 1.0
 // Runs by: ROOT macro
 // Does: FINDS and FITS peaks with Gaussians, and then linearizes the results
 // What: Calibrate your silicon strip detectors with an alpha source!
 // Credits: Some ideas from the examples multifit.C and peaks.C by Rene Brun 
-// Last updated: 02 Sep 2016 14:08:04 
-
+// Last updated: 14 Jan 2022 12:16:53 for ROOT6
 // some includes we need
 #include "TCanvas.h" // draws stuff
 #include "TMath.h" // does math
@@ -28,10 +22,9 @@
 #include "TF1.h" // makes lines
 #include "TSpectrum.h" // finds peaks
 #include <iomanip> // setprecision call (output is not crazy)
-
 // output to user on null call
-Int_t Usage(){ 
-   cout << "ffpeaks v. 0.62\n";
+void Usage(){ 
+   cout << "ffpeaks v. 1.0\n";
    cout << "\tAuthor: daid kahl\n";
    cout << "Usage:\n";
    cout << "ffpeaks.C(const Int_t np=0, char run[100], const char *ch_name, const Int_t ch_start, const Int_t ch_stop=ch_start, const Int_t interactive=1, const Int_t minimum, const Int_t maximum)" <<endl;
@@ -45,24 +38,20 @@ Int_t Usage(){
    cout << "\t[maximum]: Maximum value; Default: 4096\n";
    cout << "\t\tNOTE! [minimum] and [maximum] take *bin* value and not the *value*.  Please check your histogram binning!\n";
 }
-
-
-void ffpeaks(const Int_t np=0,char run[100],const char *ch_name,const Int_t ch_start,const Int_t ch_stop, const Int_t interactive=1, const Int_t minimum=0, const Int_t maximum=4096) {
+void ffpeaks(const Int_t np=0,char run[100]=" ",const char *ch_name=" ",const Int_t ch_start=0,const Int_t ch_stop=0, const Int_t interactive=1, const Int_t minimum=0, const Int_t maximum=4096) {
    // A few other options
    // Even if you are not a coding expert, you should be free to change these as you need!!
    // calibsets and calibpeaks all may need to be changed if you don't use CRIB alpha sources 2 and 3 (or some strange condition)
-
-
    //halfwidth is used for the Gaussian fitting. 
    // 	Spectra from different detectors and data runs often need this to be tuned.
    
    // 70 um SSD
-   //Int_t halfwidth=40;
-   //Int_t halfwidth=50;
+   //Int_t halfwidth=10;
+   Int_t halfwidth=50;
    // ACTIVE TARGET 500 um SSD
-//   Int_t halfwidth=150;
+   //Int_t halfwidth=150;
    //for pad
-   Int_t halfwidth=20;
+   //Int_t halfwidth=20;
    //for strips
    //Int_t halfwidth=150;
    //for pedestal
@@ -87,10 +76,8 @@ void ffpeaks(const Int_t np=0,char run[100],const char *ch_name,const Int_t ch_s
    //  You DO NOT want these output to the calibration file as a general rule.
    
    const Int_t printpeaks=0;
-
    // You can rebin your histogram here.  Binning that is too small for raw data finds to many peaks in the same region
-
-   const Int_t rebin=10;
+   const Int_t rebin=2;
    
   if (np==0){
       Usage();
@@ -100,7 +87,7 @@ void ffpeaks(const Int_t np=0,char run[100],const char *ch_name,const Int_t ch_s
    sprintf(run_name,"%s.root",run);
    TFile *f;
    if (!(f = TFile::Open(run_name))) // Open the file or quit
-     break;
+     return; // break;
    char foutname[104];
    sprintf(foutname,"%s-%s-ch%d-%d.txt",run,ch_name,ch_start,ch_stop);
    ofstream fout;
@@ -108,6 +95,7 @@ void ffpeaks(const Int_t np=0,char run[100],const char *ch_name,const Int_t ch_s
    fout.open(foutname);
    TCanvas *c1 = new TCanvas("c1");
    Int_t npeaks;
+   Int_t nfound;
    char name[100];
    for (Int_t ch_no=ch_start;ch_no<ch_stop+1;ch_no++){
      top:  
@@ -119,15 +107,16 @@ void ffpeaks(const Int_t np=0,char run[100],const char *ch_name,const Int_t ch_s
      TH1F *h = (TH1F*)(f->Get(name))->Clone("h");
      h->Rebin(rebin);
      h->GetXaxis()->SetRange(minimum,maximum); 
+     h->GetXaxis()->SetRangeUser(minimum,maximum); 
      TH1F *h2 = (TH1F*)h->Clone("h2");
      //h2->Rebin(10);
      Float_t xpeaks[np];
      if ( peak_autofind == 1){
        //Use TSpectrum to find the peak candidates
        TSpectrum *s = new TSpectrum(npeaks+npeaks_help);// change the scale factor to find more peaks (if not successful with 1)
-       Int_t nfound = s->Search(h,2,"",0.10);
+       nfound = s->Search(h,2,"",0.10);
        printf("Found %d candidate peaks to fit\n",nfound);
-       Float_t *xpeaksfound = s->GetPositionX();
+       Double_t *xpeaksfound = s->GetPositionX();
        // check the np (number of peaks entered by user) versus nfound (number of peaks the routine found)
        if (np <=0){ 
        	cout << "No peaks found!" << endl;
@@ -139,9 +128,13 @@ void ffpeaks(const Int_t np=0,char run[100],const char *ch_name,const Int_t ch_s
             char input;
             std::cin >> input;
             switch (input){
-            case 'y': case 'Y': case 'yes': case 'Yes': const Int_t np=nfound; continue; // redfinition of np might give invalid pointer error...needs testing!
+            case 'y': case 'Y': case 'yes': case 'Yes': { 
+              const Int_t np=nfound; continue; // redfinition of np might give invalid pointer error...needs testing!
+            }
             //case 'y': case 'Y': case 'yes': case 'Yes': const Int_t np=nfound; continue; // redfinition of np might give invalid pointer error...needs testing!
-            case 'n': case 'N': case 'no': case 'No': ch_no++; if (linearize) fout << "\n0.0\t\t1.0\n"; goto top;
+            case 'n': case 'N': case 'no': case 'No': { 
+              ch_no++; if (linearize) fout << "\n0.0\t\t1.0\n"; goto top;
+            }
             default: cout << "User input error...exiting." << endl; 
             }
        }
@@ -164,7 +157,7 @@ void ffpeaks(const Int_t np=0,char run[100],const char *ch_name,const Int_t ch_s
          }
        }
        Int_t pkeep=0;
-       for (p=0;p<nfound;p++){
+       for (Int_t p=0;p<nfound;p++){
          if (pdiscard[p] == 1){
             xpeaks[pkeep]=xpeaksfound[p];
             pkeep++;
@@ -294,7 +287,7 @@ void ffpeaks(const Int_t np=0,char run[100],const char *ch_name,const Int_t ch_s
     } //if linearize==1
     if (printpeaks==1){
 	fout << endl;
-        for (n=0;n<np;n++){
+        for (Int_t n=0;n<np;n++){
            fout << xfit[n] << " ";
 	}
 	fout << endl;
