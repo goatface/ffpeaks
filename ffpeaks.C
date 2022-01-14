@@ -1,20 +1,26 @@
 /*
             DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
                     Version 2, December 2004
+
  Copyright (C) 2010, 2011, 2012, 2015 daid kahl; 2021 Thomas Chillery
+
  Everyone is permitted to copy and distribute verbatim or modified
  copies of this license document, and changing it is allowed as long
  as the name is changed.
+
             DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
    TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
+
   0. You just DO WHAT THE FUCK YOU WANT TO.
 */
+
 // Name: ffpeaks version 1.0
-// Runs by: ROOT macro
+// Runs by: ROOT6 macro
 // Does: FINDS and FITS peaks with Gaussians, and then linearizes the results
 // What: Calibrate your silicon strip detectors with an alpha source!
 // Credits: Some ideas from the examples multifit.C and peaks.C by Rene Brun 
-// Last updated: 14 Jan 2022 12:16:53 for ROOT6
+// Last updated: 14 Jan 2022 12:27:28  
+
 // some includes we need
 #include "TCanvas.h" // draws stuff
 #include "TMath.h" // does math
@@ -22,9 +28,10 @@
 #include "TF1.h" // makes lines
 #include "TSpectrum.h" // finds peaks
 #include <iomanip> // setprecision call (output is not crazy)
+
 // output to user on null call
 void Usage(){ 
-   cout << "ffpeaks v. 1.0\n";
+   cout << "ffpeaks v. 0.62\n";
    cout << "\tAuthor: daid kahl\n";
    cout << "Usage:\n";
    cout << "ffpeaks.C(const Int_t np=0, char run[100], const char *ch_name, const Int_t ch_start, const Int_t ch_stop=ch_start, const Int_t interactive=1, const Int_t minimum, const Int_t maximum)" <<endl;
@@ -38,10 +45,14 @@ void Usage(){
    cout << "\t[maximum]: Maximum value; Default: 4096\n";
    cout << "\t\tNOTE! [minimum] and [maximum] take *bin* value and not the *value*.  Please check your histogram binning!\n";
 }
+
+
 void ffpeaks(const Int_t np=0,char run[100]=" ",const char *ch_name=" ",const Int_t ch_start=0,const Int_t ch_stop=0, const Int_t interactive=1, const Int_t minimum=0, const Int_t maximum=4096) {
    // A few other options
    // Even if you are not a coding expert, you should be free to change these as you need!!
    // calibsets and calibpeaks all may need to be changed if you don't use CRIB alpha sources 2 and 3 (or some strange condition)
+
+
    //halfwidth is used for the Gaussian fitting. 
    // 	Spectra from different detectors and data runs often need this to be tuned.
    
@@ -76,7 +87,9 @@ void ffpeaks(const Int_t np=0,char run[100]=" ",const char *ch_name=" ",const In
    //  You DO NOT want these output to the calibration file as a general rule.
    
    const Int_t printpeaks=0;
+
    // You can rebin your histogram here.  Binning that is too small for raw data finds to many peaks in the same region
+
    const Int_t rebin=2;
    
   if (np==0){
