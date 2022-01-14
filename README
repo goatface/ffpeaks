@@ -1,20 +1,9 @@
-Author: daid kahl
-Name: ffpeaks version 0.62
-Runs by: ROOT macro
-Does: FINDS and FITS peaks with Gaussians, and then linearizes the results
-What: Calibrate your silicon strip detectors with an alpha source!
-Credits: Some ideas from the examples multifit.C and peaks.C by Rene Brun 
-
-Call with no arguments to see how to invoke:
-
-daid@titanium ~/active/progs/alpha-calib-root % root
-
-*****************************
-* Welcome to ROOT v5.34/18 *
-*****************************
+**************************
+ Welcome to ROOT v6.25/01 
+**************************
 
 root [0] .x ffpeaks.C
-ffpeaks v. 0.62
+ffpeaks v. 1.0
         Author: daid kahl
 Usage:
 ffpeaks.C(const Int_t np=0, char run[100], const char *ch_name, const Int_t ch_start, const Int_t ch_stop=ch_start, const Int_t interactive=1, const Int_t minimum, const Int_t maximum)
@@ -27,4 +16,5 @@ ffpeaks.C(const Int_t np=0, char run[100], const char *ch_name, const Int_t ch_s
         [minimum]: Minimum value (increase to remove pedestal); Default: 0
         [maximum]: Maximum value; Default: 4096
                 NOTE! [minimum] and [maximum] take *bin* value and not the *value*.  Please check your histogram binning!
+root [1] 
 
