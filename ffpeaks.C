@@ -31,7 +31,7 @@
 
 // output to user on null call
 void Usage(){ 
-   cout << "ffpeaks v. 0.62\n";
+   cout << "ffpeaks v. 1.0\n";
    cout << "\tAuthor: daid kahl\n";
    cout << "Usage:\n";
    cout << "ffpeaks.C(const Int_t np=0, char run[100], const char *ch_name, const Int_t ch_start, const Int_t ch_stop=ch_start, const Int_t interactive=1, const Int_t minimum, const Int_t maximum)" <<endl;
